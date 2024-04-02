@@ -1,0 +1,22 @@
+﻿@page
+@model PlayersModel
+@{
+    ViewData["Title"] = "Players";
+    ViewData["ShowNavbar"] = true;
+}
+
+<h1>Players</h1>
+
+@if (Model.Players.Any())
+{
+    <ul>
+        @foreach (var player in Model.Players)
+        {
+            <li>@player.Name - Age: @player.Age, Position: @player.Position</li>
+        }
+    </ul>
+}
+else
+{
+    <p>No players found for this team.</p>
+}

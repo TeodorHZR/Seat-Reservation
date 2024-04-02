@@ -1,0 +1,17 @@
+﻿@page
+@model PrivacyModel
+@{
+    ViewData["Title"] = "Admin Page";
+}
+<h1>@ViewData["Title"]</h1>
+
+<ul>
+    @foreach (var eventItem in Model.Events)
+    {
+        <li>
+            <strong>@eventItem.Nume</strong><br />
+            <span>@eventItem.DataOra.ToShortDateString()</span>
+            <button class="btn btn-primary" onclick="showPopup('@eventItem.IdEveniment')">Cumpara bilet chiar acum</button>
+        </li>
+    }
+</ul>

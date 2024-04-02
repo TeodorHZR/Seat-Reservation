@@ -1,0 +1,23 @@
+﻿@page
+@model TeamsModel
+@{
+    ViewData["Title"] = "Teams";
+    ViewData["ShowNavbar"] = true;
+}
+
+<h1>Teams</h1>
+
+@foreach (var country in Model.TeamsByCountry)
+{
+    <h2>@country.Key</h2>
+    <ul>
+        @foreach (var team in country.Value)
+        {
+            <li>
+                <a asp-page="/Players" asp-route-teamId="@team.TeamId">@team.Name</a>
+            </li>
+        }
+    </ul>
+}
+
+

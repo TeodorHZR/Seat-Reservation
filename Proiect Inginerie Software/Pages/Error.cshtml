@@ -1,0 +1,135 @@
+﻿@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Events";
+    ViewData["ShowNavbar"] = true;
+}
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        right: 100;
+        width: 400px;
+        border: 1px solid #888;
+        background-color: #fefefe;
+        padding: 20px;
+        z-index: 1;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+
+<h3>Lista de evenimente</h3>
+<ul>
+    @foreach (var eventItem in Model.Events)
+    {
+        <li>
+            <strong>@eventItem.Nume</strong><br />
+            <span>@eventItem.DataOra.ToShortDateString()</span>
+            <button class="btn btn-primary" onclick="showPopup('@eventItem.IdEveniment')">Rezerva bilet chiar acum</button>
+        </li>
+    }
+</ul>
+
+<div class="modal" id="popupModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">×</span>
+        <h2>Alegeti sectorul</h2>
+        <select id="sectorDropdown" onchange="loadSeats()">
+            <option value="">Alegeti un sector</option>
+        </select>
+        <h2>Alegeti locul</h2>
+        <select id="seatDropdown">
+            <option value="">Alegeti un loc</option>
+        </select>
+        <button class="btn btn-success" onclick="reserveTicket()">Rezerva bilet</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var sectors = []; 
+
+        function showPopup(eventId) {
+            document.getElementById('popupModal').style.display = 'block';
+            loadSectors(eventId);
+        }
+
+        function loadSectors(eventId) {
+            fetch(`/Error?handler=Sectors&eventId=${eventId}`)
+                .then(response => response.json())
+                .then(sectorsData => {
+                    
+                    sectors = sectorsData;
+                    console.log(sectors);
+                    var sectorDropdown = document.getElementById('sectorDropdown');
+                    sectorDropdown.innerHTML = '<option value="">Alegeti un sector</option>';
+                    sectors.forEach(sector => {
+                        var option = document.createElement('option');
+                        option.value = sector.idSector;
+                        option.text = sector.nume;
+                        sectorDropdown.appendChild(option);
+                    });
+                });
+        }
+
+        function loadSeats() {
+            var sectorDropdown = document.getElementById('sectorDropdown');
+            var selectedIndex = sectorDropdown.selectedIndex;
+            var selectedSectorId = sectorDropdown.options[selectedIndex].value;
+
+ 
+            var selectedSector = sectors.find(sector => sector.idSector == selectedSectorId);
+
+            if (selectedSector) {
+
+                var sectorId = selectedSector.idSector;
+
+                fetch(`/Error?handler=Seats&sectorId=${sectorId}`)
+                    .then(response => response.json())
+                    .then(seats => {
+                        var seatDropdown = document.getElementById('seatDropdown');
+                        seatDropdown.innerHTML = '<option value="">Alegeti un loc</option>';
+                        seats.forEach(seat => {
+                            var option = document.createElement('option');
+                            option.value = seat.idloc;
+                            option.text = seat.numar;
+                            seatDropdown.appendChild(option);
+                        });
+                    });
+            } else {
+                console.error("Sectorul selectat nu a fost gasit in lista de sectoare.");
+            }
+        }
+
+        function reserveTicket() {
+            alert("Veti fi contactat in cel mai scurt timp pe email pentru finalizarea rezervarii.");
+            closeModal();
+        }
+
+
+        function closeModal() {
+            document.getElementById('popupModal').style.display = 'none';
+        }
+    </script>
+    }
